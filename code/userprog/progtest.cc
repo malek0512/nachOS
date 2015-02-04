@@ -14,6 +14,8 @@
 #include "addrspace.h"
 #include "synch.h"
 
+#include "synchconsole.h"
+
 //----------------------------------------------------------------------
 // StartProcess
 //      Run a user program.  Open the executable, load it into
@@ -49,6 +51,7 @@ StartProcess (char *filename)
 // I/O requests wait on a Semaphore to delay until the I/O completes.
 
 static Console *console;
+
 static Semaphore *readAvail;
 static Semaphore *writeDone;
 
@@ -58,12 +61,12 @@ static Semaphore *writeDone;
 //----------------------------------------------------------------------
 
 static void
-ReadAvail (int arg)
+ReadAvail (int arg) //La fonction est appelée lorsqu'un caractere est tapé sur clavier (par Console.c)
 {
     readAvail->V ();
 }
 static void
-WriteDone (int arg)
+WriteDone (int arg) //La fonction est appelée lorsqu'un caractere est bien affiché a dans la console (par Console.c)
 {
     writeDone->V ();
 }
@@ -80,16 +83,56 @@ ConsoleTest (char *in, char *out)
     char ch;
 
     console = new Console (in, out, ReadAvail, WriteDone, 0);
-    readAvail = new Semaphore ("read avail", 0);
-    writeDone = new Semaphore ("write done", 0);
+    readAvail = new Semaphore ("read avail", 0); //Handler d'interruption lors d'une lecture availble
+    writeDone = new Semaphore ("write done", 0); //Handler d'interruption d'une ecriture terminée
 
     for (;;)
       {
 	  readAvail->P ();	// wait for character to arrive
 	  ch = console->GetChar ();
+	  if (ch != '\n') {
+		  console->PutChar ('<');
+		  writeDone->P ();	// wait for write to finish
+	  }
 	  console->PutChar (ch);	// echo it!
 	  writeDone->P ();	// wait for write to finish
-	  if (ch == 'q')
+	  if (ch != '\n') {
+	  		  console->PutChar ('>');
+	  		  writeDone->P ();	// wait for write to finish
+	  	  }
+	  if (ch == EOF)
 	      return;		// if q, quit
       }
 }
+
+#ifdef CHANGED
+
+void
+SynchConsoleTest (char *in, char *out)
+{
+	static SynchConsole *synchconsoleProgTest;
+    char ch;
+
+    synchconsoleProgTest = new SynchConsole (in, out);
+
+    while((ch = synchconsole->SynchGetChar()) != EOF){
+    	synchconsoleProgTest->SynchPutChar(ch);
+    }
+    fprintf(stderr, "Solaris:EOF detected in SynchConsole!\n);");
+
+//    for (;;)
+//      {
+//	  ch = synchconsole->SynchGetChar ();
+//	  if (ch != '\n') {
+//		  synchconsole->SynchPutChar ('<');
+//	  }
+//	  synchconsole->SynchPutChar (ch);	// echo it!
+//	  if (ch != '\n') {
+//		  	  synchconsole->SynchPutChar ('>');
+//	  	  }
+//	  if (ch == EOF)
+//	      return;		// if q, quit
+//      }
+}
+
+#endif //CHANGED

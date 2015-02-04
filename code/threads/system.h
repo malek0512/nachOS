@@ -49,4 +49,12 @@ extern SynchDisk *synchDisk;
 extern PostOffice *postOffice;
 #endif
 
+//--------------------------------------------------------------------------- Malek
+#ifdef CHANGED
+#ifdef USER_PROGRAM
+	#include "synchconsole.h"
+	extern SynchConsole *synchconsole;
+#endif //USER_PROGRAM
+#endif //CHANGED
+	//--------------------------------------------------------------------------- Malek
 #endif // SYSTEM_H

@@ -18,7 +18,15 @@ Interrupt *interrupt;		// interrupt status
 Statistics *stats;		// performance metrics
 Timer *timer;			// the hardware timer device,
 					// for invoking context switches
+char *in = NULL, *out = NULL; // for SynchConsole intialization
 
+//--------------------------------------------------------------------------- Malek
+#ifdef CHANGED
+#ifdef USER_PROGRAM
+SynchConsole *synchconsole;
+#endif //USER_PROGRAM
+#endif //CHANGED
+//--------------------------------------------------------------------------- Malek
 #ifdef FILESYS_NEEDED
 FileSystem *fileSystem;
 #endif
@@ -105,6 +113,7 @@ Initialize (int argc, char **argv)
 		      argCount = 2;
 		  }
 	    }
+
 	  else if (!strcmp (*argv, "-rs"))
 	    {
 		ASSERT (argc > 1);
@@ -113,6 +122,7 @@ Initialize (int argc, char **argv)
 		randomYield = TRUE;
 		argCount = 2;
 	    }
+
 #ifdef USER_PROGRAM
 	  if (!strcmp (*argv, "-s"))
 	      debugUserProg = TRUE;
@@ -135,6 +145,28 @@ Initialize (int argc, char **argv)
 		argCount = 2;
 	    }
 #endif
+	  //--------------------------------------------------------------------------- Malek
+	  //On gere les option de de fichier en arguement du programme d'initialisation (au même titre qque les options -rs (pour random)
+	  // -in <filename> et -out <filename>
+#ifdef CHANGED
+#ifdef USER_PROGRAM
+
+	  if (!strcmp (*argv, "-in"))
+	  {
+		ASSERT (argc > 1);
+		in = (*(argv + 1));	// Il n devrait pas y avoir de probeleme a reutiliser directement le pointer
+		argCount = 2;
+	  }
+	  else if (!strcmp (*argv, "-out"))
+	  {
+		ASSERT (argc > 1);
+		out = (*(argv + 1));	// Il n devrait pas y avoir de probeleme a reutiliser directement le pointer
+		argCount = 2;
+	  }
+
+#endif //USER_PROGRAM
+#endif //CHANGED
+    //--------------------------------------------------------------------------- Malek
       }
 
     DebugInit (debugArgs);	// initialize DEBUG messages
@@ -170,6 +202,15 @@ Initialize (int argc, char **argv)
 #ifdef NETWORK
     postOffice = new PostOffice (netname, rely, 10);
 #endif
+
+    //--------------------------------------------------------------------------- Malek
+    // On gere la creation de l'objet SynchConsole pour effectuer l'appel a syncosole->putchar() lors de l'appel systeme PutChar() definie dans Strat.S en assembleur
+#ifdef CHANGED
+#ifdef USER_PROGRAM
+    synchconsole = new SynchConsole(in,out);
+#endif //USER_PROGRAM
+#endif //CHANGED
+    //--------------------------------------------------------------------------- Malek
 }
 
 //----------------------------------------------------------------------
@@ -195,7 +236,13 @@ Cleanup ()
 #ifdef FILESYS
     delete synchDisk;
 #endif
-
+    //--------------------------------------------------------------------------- Malek
+#ifdef CHANGED
+#ifdef USER_PROGRAM
+    delete synchconsole;
+#endif //USER_PROGRAM
+#endif //CHANGED
+    //--------------------------------------------------------------------------- Malek
     delete timer;
     delete scheduler;
     delete interrupt;

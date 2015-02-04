@@ -44,9 +44,9 @@ __start:
 	.globl Halt
 	.ent	Halt
 Halt:
-	addiu $2,$0,SC_Halt
+	addiu $2,$0,SC_Halt		/* Par convention on met ca dans le registre 2 */
 	syscall
-	j	$31
+	j	$31					/* <=> jump adress retour; RET */
 	.end Halt
 
 	.globl Exit
@@ -128,6 +128,14 @@ Yield:
 	syscall
 	j	$31
 	.end Yield
+
+	.globl PutChar
+	.ent	PutChar
+PutChar:
+	addiu $2,$0,SC_PutChar
+	syscall
+	j	$31
+	.end PutChar
 
 /* dummy function to keep gcc happy */
         .globl  __main

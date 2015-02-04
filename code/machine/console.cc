@@ -44,7 +44,7 @@ Console::Console(char *readFile, char *writeFile, VoidFunctionPtr readAvail,
     else
     	readFileNo = OpenForReadWrite(readFile, TRUE);	// should be read-only
     if (writeFile == NULL)
-	writeFileNo = 1;				// display = stdout
+    	writeFileNo = 1;				// display = stdout
     else
     	writeFileNo = OpenForWrite(writeFile);
 
