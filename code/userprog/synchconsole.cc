@@ -13,6 +13,7 @@
 
 static Semaphore *readAvail;
 static Semaphore *writeDone;
+
 static void ReadAvail(int arg) { readAvail->V(); }
 static void WriteDone(int arg) { writeDone->V(); }
 

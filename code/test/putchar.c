@@ -1,5 +1,4 @@
 #include <syscall.h>
-#include <console.h>
 
 void print (char c, int n) {
     int i;
