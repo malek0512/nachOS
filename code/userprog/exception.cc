@@ -40,6 +40,24 @@ UpdatePC ()
     machine->WriteRegister (NextPCReg, pc);
 }
 
+//char buffer[MAX_STRING_SIZE];
+//void copyStringFromMachine(int from, char *to, unsigned size) {
+////		(char*) (machine->ReadRegister (4))
+//		int _from = from;
+//		unsigned _size = size - 1;
+//		//char* to = calloc(size); //allocation du buffer effetué a l'appel
+//		int* dataByte;
+//		int cpt = 0;
+//		while (cpt<_size && machine->ReadMem(_from, 1, dataByte)) { //Le && en C est equivalent a un ET PUIS donc quand cpt==_size on ne fait l'appel de lecture
+//			to[cpt] = (char) (*dataBte);
+//			cpt++;
+//		}
+//		//On tronc si le string est plus grand
+//		if (cpt == _size) {
+//			cpt++;
+//			to[cpt] = '\0';
+//		}
+//}
 
 //----------------------------------------------------------------------
 // ExceptionHandler
@@ -67,20 +85,23 @@ UpdatePC ()
 void
 ExceptionHandler (ExceptionType which)
 {
+	//Lecture de l'exception (appel systeme ecrit dans r2 dans Start.S)
     int type = machine->ReadRegister (2);
 
 
-#ifndef CHANGED //if*n*def
+#ifndef CHANGED //if*not*def
     if ((which == SyscallException) && (type == SC_Halt))
       {
 	  DEBUG ('a', "Shutdown, initiated by user program.\n");
 	  interrupt->Halt ();
+	      UpdatePC ();
       }
     else
       {
 	  printf ("Unexpected user mode exception %d %d\n", which, type);
 	  ASSERT (FALSE);
       }
+
 
 #else //CHANGED
     if (which == SyscallException )
@@ -92,11 +113,17 @@ ExceptionHandler (ExceptionType which)
     		break;
 
     	case SC_PutChar :
-    		DEBUG ('a', "Shutdown, initiated by user program.\n");
+    		DEBUG ('a', "PutCHar, initiated by user program.\n");
 //    		interrupt->Halt ();
 //    		char ccc =(char) (machine->ReadRegister (4));
     		synchconsole->SynchPutChar((char) (machine->ReadRegister (4))); //L'objet syncosole est déclaré dans main.cc donc initialiser au demarrage du systeme
     		break;
+
+    	case SC_PutString :
+			DEBUG ('a', "PutSTring, initiated by user program.\n");
+			synchconsole->SynchPutString((char*) (machine->ReadRegister (4))); //L'objet syncosole est déclaré dans main.cc donc initialiser au demarrage du systeme
+			break;
+
     	default:
     		printf ("Unexpected user mode exception %d %d\n", which, type);
     		ASSERT (FALSE);

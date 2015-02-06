@@ -32,6 +32,7 @@
 //--------------------------------------------------------------------------- Malek
 #ifdef CHANGED
 #define SC_PutChar	11
+#define SC_PutString	12
 #endif //CHANGED
 //--------------------------------------------------------------------------- Malek
 #ifdef IN_USER_MODE

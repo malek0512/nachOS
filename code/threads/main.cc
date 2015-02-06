@@ -24,7 +24,7 @@
 //    -s causes user programs to be executed in single-step mode
 //    -x runs a user program
 //    -c tests the console
-//	  -sc test de la console synchrone qui lance SunchConsoleTest
+//	  -sc test de la console synchrone qui lance SynchConsoleTest
 //
 //  FILESYS
 //    -f causes the physical disk to be formatted
